@@ -144,7 +144,7 @@ def data_preprocess(data):
     return new_data
 
 train_data_preprocess = data_preprocess(train_data_split)
-
+del train_data_split
 def RepresentsInt(s):
     try: 
         int(s)
@@ -348,8 +348,14 @@ final_train_data = []
 final_train_label = []
 datalength = len(train_data_preprocess)
 
+del df_train
+del df_test
+del df_meta
+del df_submission
+# 메모리 관리중
+
 num_error = 0
-for i in range(datalength):
+for i in range(datalength//2):
     if(i%10000 ==0):
         print('making data....', i)
     try:
@@ -361,10 +367,38 @@ for i in range(datalength):
     
 final_train_data = np.asarray(final_train_data)
 final_train_label = np.asarray(final_train_label)
-print('number of error is : ', num_error)
-print('total data is : ', len(final_train_data))
-with open('final_train_data.pickle', 'wb') as f:
+
+with open('final_train_data1.pickle', 'wb') as f:
     pickle.dump(final_train_data, f, pickle.HIGHEST_PROTOCOL)
     
-with open('final_train_label.pickle', 'wb') as f:
-    pickle.dump(final_train_label, f, pickle.HIGHEST_PROTOCOL)
+with open('final_train_label1.pickle', 'wb') as f:
+    pickle.dump(final_train_label, f, pickle.HIGHEST_PROTOCOL)    
+
+print('number of error is : ', num_error)
+print('total data is : ', len(final_train_data))    
+    
+final_train_data = []
+final_train_label = []
+
+for i in range(datalength//2,len(train_data_preprocess)):
+    if(i%10000 ==0):
+        print('making data....', i)
+    try:
+        temp_train, temp_label = MakeEmbeddingVector(train_data_preprocess[i])
+    except:
+        num_error += 1
+    final_train_data.append(temp_train)
+    final_train_label.append(temp_label)  
+    
+final_train_data = np.asarray(final_train_data)
+final_train_label = np.asarray(final_train_label)
+
+with open('final_train_data2.pickle', 'wb') as f:
+    pickle.dump(final_train_data, f, pickle.HIGHEST_PROTOCOL)
+    
+with open('final_train_label2.pickle', 'wb') as f:
+    pickle.dump(final_train_label, f, pickle.HIGHEST_PROTOCOL)    
+    
+
+print('number of error is : ', num_error)
+print('total data is : ', len(final_train_data))
